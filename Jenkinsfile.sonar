@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SONAR_TOKEN = credentials('SONAR-PROJECT') // Assuming you have stored your SonarQube token in Jenkins credentials
+        SONAR_TOKEN = credentials('SONAR-PROJECT') // Ensure this matches your credentials ID
     }
 
     stages {
@@ -13,7 +13,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Start Services') {
             steps {
                 script {
@@ -41,15 +41,15 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                sh """
-                sonar-scanner \
-                  -Dsonar.projectKey=your_project_key \  // Replace with your actual project key
-                  -Dsonar.sources=. \
-                  -Dsonar.host.url=http://192.168.201.13:9000 \
-                  -Dsonar.login=\$SONAR_TOKEN
-                """ 
-                    
+                    withCredentials([string(credentialsId: 'SONAR-PROJECT', variable: 'SONAR_TOKEN')]) {
+                        sh """
+                        sonar-scanner \
+                          -Dsonar.projectKey=your_project_key \  // Replace with your actual project key
+                          -Dsonar.sources=. \
+                          -Dsonar.host.url=http://192.168.201.13:9000 \
+                          -Dsonar.login=\$SONAR_TOKEN
+                        """
+                    }
                 }
             }
         }
@@ -69,4 +69,4 @@ pipeline {
     }
 }
 
-}
+
