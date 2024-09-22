@@ -41,13 +41,15 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    sh """
-                    sonar-scanner \
-                      -Dsonar.projectKey=your_project_key \
-                      -Dsonar.sources=. \
-                      -Dsonar.host.url=http://192.168.201.13:9000 \
-                      -Dsonar.login=${SONAR_TOKEN}
-                    """
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                sh """
+                sonar-scanner \
+                  -Dsonar.projectKey=your_project_key \  // Replace with your actual project key
+                  -Dsonar.sources=. \
+                  -Dsonar.host.url=http://192.168.201.13:9000 \
+                  -Dsonar.login=\$SONAR_TOKEN
+                """ 
+                    
                 }
             }
         }
@@ -65,4 +67,5 @@ pipeline {
             echo 'Pipeline failed.'
         }
     }
+}
 }
