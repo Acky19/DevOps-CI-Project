@@ -1,71 +1,49 @@
 pipeline {
-    agent any
-    
+    agent any // Use any available agent
+
     tools{
-        jdk 'jdk17'
-        nodejs 'node16'
-        
+         nodejs 'node16'
     }
-    
-    environment{
-        SCANNER_HOME= tool 'sonar-scanner'
-    }
-    
+
     stages {
-        stage('Git Checkout') {
+        stage('Install Dependencies') {
             steps {
-                git branch: 'main', url: 'https://github.com/jaiswaladi246/fullstack-bank.git'
-            }
-        }
-        
-        stage('OWASP FS SCAN') {
-            steps {
-                dependencyCheck additionalArguments: '--scan ./app/backend --disableYarnAudit --disableNodeAudit', odcInstallation: 'DC'
-                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
-        
-        stage('TRIVY FS SCAN') {
-            steps {
-                sh "trivy fs ."
-            }
-        }
-        
-        stage('SONARQUBE ANALYSIS') {
-            steps {
-                withSonarQubeEnv('sonar') {
-                    sh " $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Bank -Dsonar.projectKey=Bank "
+                script {
+                    // Run npm install
+                    sh 'npm install'
                 }
             }
         }
-        
-        
-         stage('Install Dependencies') {
+        stage('Start Services') {
             steps {
-                sh "npm install"
-            }
-        }
-        
-        stage('Backend') {
-            steps {
-                dir('/root/.jenkins/workspace/Bank/app/backend') {
-                    sh "npm install"
+                script {
+                    // Run npm run compose:up
+                    sh 'npm run compose:up'
                 }
             }
         }
-        
-        stage('frontend') {
+        stage('Run Integration Tests') {
             steps {
-                dir('/root/.jenkins/workspace/Bank/app/frontend') {
-                    sh "npm install"
+                script {
+                    // Run npm run test:integration
+                    sh 'npm run test:integration'
                 }
             }
         }
-        
-        stage('Deploy to Conatiner') {
+        stage('Run End-to-End Tests') {
             steps {
-                sh "npm run compose:up -d"
+                script {
+                    // Run npm run test:e2e
+                    sh 'npm run test:e2e'
+                }
             }
+        }
+    }
+
+    post {
+        always {
+            // Cleanup or other actions can be added here if needed
+            echo 'Pipeline finished.'
         }
     }
 }
