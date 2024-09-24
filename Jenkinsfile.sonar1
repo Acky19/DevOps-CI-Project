@@ -46,7 +46,8 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withCredentials([string(credentialsId: 'SONAR-PROJECT', variable: )]) {
+                withCredentials([string(credentialsId: 'SONAR-PROJECT', variable: )])
+                 {
                     withSonarQubeEnv('sonar-scanner') { // Ensure 'SonarQube' matches your SonarQube server config name in Jenkins
                      sh """
                      ${SCANNER_HOME}/bin/sonar-scanner \
