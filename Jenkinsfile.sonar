@@ -46,10 +46,10 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withCredentials([string(credentialsId: 'SONAR-PROJECT', variable: 'SONAR_API_KEY')]) {
+                withCredentials([string(credentialsId: 'SONAR-PROJECT', variable: )]) {
                     withSonarQubeEnv('sonar-scanner') { // Ensure 'SonarQube' matches your SonarQube server config name in Jenkins
-                        sh """
-                        ${SCANNER_HOME}/bin/sonar-scanner \
+                     sh """
+                     ${SCANNER_HOME}/bin/sonar-scanner \
                     -Dsonar.projectKey=Bank \
                     -Dsonar.sources=. \
                     -Dsonar.host.url=http://192.168.201.13:9000 \
