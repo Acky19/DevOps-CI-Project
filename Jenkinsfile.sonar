@@ -52,8 +52,8 @@ pipeline {
                         ${SCANNER_HOME}/bin/sonar-scanner \
                         -Dsonar.projectKey=Bank \
                         -Dsonar.sources=. \
-                        -Dsonar.host.url=${SONAR_HOST_URL} \
-                        -Dsonar.login=${SONAR_API_KEY} \
+                        -Dsonar.host.url=${Bank} \
+                        -Dsonar.login=${Bank} \
                         -Dsonar.sourceEncoding=UTF-8 \
                         -Dsonar.language=js,ts \
                         -Dsonar.sources=./app/backend/src
