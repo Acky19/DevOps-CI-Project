@@ -6,10 +6,10 @@ pipeline {
     }
 
     environment {
-        SONAR_TOKEN = credentials('SONAR-PROJECT') // Ensure 'SONAR-PROJECT' matches your Jenkins credentials ID
-        SCANNER_HOME = tool name: 'sonar-scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation' // Correct SonarQube scanner tool configuration
-        SONAR_HOST_URL = 'http://192.168.201.13:9000' // Update this with your actual SonarQube server URL
+        SONAR_TOKEN = credentials('SONAR-PROJECT') // Use Jenkins credentials for the Sonar token
+        SCANNER_HOME = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
     }
+
 
     stages {
         stage('Install Dependencies') {
@@ -50,12 +50,10 @@ pipeline {
                     withSonarQubeEnv('SonarQubeScanner') { // Ensure 'SonarQube' matches your SonarQube server config name in Jenkins
                         sh """
                         ${SCANNER_HOME}/bin/sonar-scanner \
-                        -Dsonar.projectKey=Bank \
-                        -Dsonar.host.url=${Bank} \
-                        -Dsonar.login=${SONAR-TOKEN} \
-                        -Dsonar.sourceEncoding=UTF-8 \
-                        -Dsonar.language=js,ts \
-                        -Dsonar.sources=./app/backend/src
+                    -Dsonar.projectKey=Bank \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=http://192.168.201.13:9000 \
+                    -Dsonar.login=${SONAR_TOKEN}
                         """
                     }
                 }
