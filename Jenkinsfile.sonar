@@ -8,6 +8,7 @@ pipeline {
     environment {
         SONAR_TOKEN = credentials('SONAR-PROJECT') // Ensure 'SONAR-PROJECT' matches your Jenkins credentials ID
         SCANNER_HOME = tool name: 'sonar-scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation' // Correct SonarQube scanner tool configuration
+        SONAR_HOST_URL = 'http://192.168.201.13:9000' // Update this with your actual SonarQube server URL
     }
 
     stages {
@@ -18,7 +19,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Start Services') {
             steps {
                 script {
@@ -42,16 +43,17 @@ pipeline {
                 }
             }
         }
+
         stage('SonarQube Analysis') {
             steps {
-                withCredentials([string(credentialsId: params.SONAR_API_KEY_ID, variable: 'SONAR_API_KEY')]) {
-                    withSonarQubeEnv('sonar') { // 'sonar' should match your SonarQube server configuration name in Jenkins
+                withCredentials([string(credentialsId: 'SONAR-PROJECT', variable: 'SONAR_API_KEY')]) {
+                    withSonarQubeEnv('SonarQube') { // Ensure 'SonarQube' matches your SonarQube server config name in Jenkins
                         sh """
-                        $SCANNER_HOME/bin/sonar-scanner \
+                        ${SCANNER_HOME}/bin/sonar-scanner \
                         -Dsonar.projectKey=Bank \
                         -Dsonar.sources=. \
                         -Dsonar.host.url=${SONAR_HOST_URL} \
-                        -Dsonar.login=$SONAR_API_KEY \
+                        -Dsonar.login=${SONAR_API_KEY} \
                         -Dsonar.sourceEncoding=UTF-8 \
                         -Dsonar.language=js,ts \
                         -Dsonar.sources=./app/backend/src
@@ -60,28 +62,26 @@ pipeline {
                 }
             }
         }
-       // stage('OWASP Dependency Check') {
-           // steps {
-               // dependencyCheck additionalArguments: '--scan ./app/backend --disableYarnAudit --disableNodeAudit', odcInstallation: 'DC'
-                // dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-           // }
-        //}
+
         stage('Start Containers') {
             steps {
                 sh 'npm run compose:up'
             }
         }
-        stage('Run Integration Tests') {
+
+        stage('Run Integration Tests Again') {
             steps {
                 sh 'npm run test:integration'
             }
         }
-        stage('Run E2E Tests') {
+
+        stage('Run E2E Tests Again') {
             steps {
                 sh 'npm run test:e2e'
             }
         }
-        // Uncomment if you want to bring the containers down after tests
+
+        // Uncomment this block if you want to stop containers after tests
         /*
         stage('Stop Containers') {
             steps {
@@ -90,13 +90,13 @@ pipeline {
         }
         */
     }
+
     post {
         always {
             echo 'Cleaning up resources...'
-            // Ensure containers are stopped regardless of build status
-            sh 'npm run compose:down || true'
-            // Clean up the workspace
-            deleteDir() // Deletes the workspace directory
+            sh 'npm run compose:down || true' // Ensure containers are stopped even if the build fails
+            deleteDir() // Clean up the workspace
         }
     }
 }
+
