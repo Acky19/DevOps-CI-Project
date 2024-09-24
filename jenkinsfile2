@@ -23,7 +23,7 @@ pipeline {
                         sh """
                         $SCANNER_HOME/bin/sonar-scanner \
                         -Dsonar.projectKey=Bank \
-                        -Dsonar.sources=./app/backend/src \
+                        -Dsonar.sources=. /opt/sonar-scanner \
                         -Dsonar.host.url=${SONAR_HOST_URL} \
                         -Dsonar.login=$SONAR_API_KEY \
                         -Dsonar.sourceEncoding=UTF-8
