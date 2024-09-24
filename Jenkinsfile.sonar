@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+   tools{
+        nodejs 'node16'
+        
+    }
+
     environment {
         SONAR_TOKEN = credentials('SONAR-PROJECT') // Ensure 'sonar-token' matches your Jenkins credentials ID
         SCANNER_HOME= tool 'sonar-scanner'
