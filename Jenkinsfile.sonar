@@ -45,7 +45,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('sonar') { // Ensure 'sonar' matches your SonarQube server configuration in Jenkins
+                withSonarQubeEnv('SonarQube') { // Ensure 'sonar' matches your SonarQube server configuration in Jenkins
                     sh """ 
                     ${SCANNER_HOME}/bin/sonar-scanner \
                         -Dsonar.projectName="Bank" \
