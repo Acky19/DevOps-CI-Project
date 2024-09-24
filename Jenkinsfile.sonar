@@ -1,19 +1,45 @@
 pipeline {
     agent any
-    parameters {
-        string(name: 'SONAR_HOST_URL', defaultValue: 'http://192.168.201.13:9000', description: 'SonarQube host URL')
-        string(name: 'SONAR_API_KEY_ID', defaultValue: 'sonar_api_key', description: 'SonarQube API key credentials ID')
-    }
+
     tools {
-        nodejs 'node16' // Ensure Node.js 16 is installed on Jenkins
+        nodejs 'node16' // Ensure 'node16' matches the Node.js version configured in Jenkins
     }
+
     environment {
-        SCANNER_HOME = tool 'sonar-scanner' // Assuming SonarQube scanner is configured
+        SONAR_TOKEN = credentials('SONAR-PROJECT') // Ensure 'SONAR-PROJECT' matches your Jenkins credentials ID
+        SCANNER_HOME = tool name: 'sonar-scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation' // Correct SonarQube scanner tool configuration
     }
+
     stages {
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                script {
+                    sh 'npm install'
+                }
+            }
+        }
+        
+        stage('Start Services') {
+            steps {
+                script {
+                    sh 'npm run compose:up'
+                }
+            }
+        }
+
+        stage('Run Integration Tests') {
+            steps {
+                script {
+                    sh 'npm run test:integration'
+                }
+            }
+        }
+
+        stage('Run End-to-End Tests') {
+            steps {
+                script {
+                    sh 'npm run test:e2e'
+                }
             }
         }
         stage('SonarQube Analysis') {
@@ -74,7 +100,3 @@ pipeline {
         }
     }
 }
-Gech has paused their notifications
-
-
-Message Gech
